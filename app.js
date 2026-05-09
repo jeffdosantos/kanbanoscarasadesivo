@@ -117,7 +117,12 @@ function showApp(){dom.auth.classList.add("hidden");dom.app.classList.remove("hi
 async function ensureMember(s){let email=s.user.email;let {data,error}=await supabase.from("team_members").select("*").eq("email",email).eq("ativo",true).maybeSingle();if(error)throw error;if(!data)throw new Error("Seu e-mail não está cadastrado como membro ativo em team_members.");member=data;return data}
 async function loadMembers(){let {data,error}=await supabase.from("team_members").select("*").eq("ativo",true).order("nome");if(error)throw error;members=data||[];fillMembers()}
 async function loadTasks(){let {data,error}=await supabase.from("tasks").select("*").order("prazo",{ascending:true,nullsFirst:false}).order("created_at",{ascending:false});if(error)throw error;tasks=data||[];renderAll()}
-async function start(s){try{session=s;let m=await ensureMember(s);showApp();await loadMembers();dom.organizer.textContent=m.nome;await loadTasks();subscribe()}catch(e){console.error(e);showAuth();toast(e.message,"error")}}
+async function start(s){try{session=s;let m=await ensureMember(s);showApp();await loadMembers();dom.organizer.textContent=m.nome;const currentUserName = document.querySelector("#currentUserName");
+
+if (currentUserName) {
+  currentUserName.textContent = `👤 ${m.nome}`;
+}
+await loadTasks();subscribe()}catch(e){console.error(e);showAuth();toast(e.message,"error")}}
 function subscribe(){if(channel)supabase.removeChannel(channel);channel=supabase.channel("tasks").on("postgres_changes",{event:"*",schema:"public",table:"tasks"},()=>loadTasks()).subscribe()}
 function renderAll(){renderDates();renderQuick();renderBoard();renderClients();renderTeam();renderDeadlines();renderBlockers();renderMetrics();renderArchive();renderStatic()}
 function renderDates(){let s=startWeek(),e=addDays(s,4),f=new Intl.DateTimeFormat("pt-BR",{day:"2-digit",month:"2-digit"});dom.week.textContent=`${f.format(s)} – ${f.format(e)}/${e.getFullYear()}`;dom.updated.textContent=new Intl.DateTimeFormat("pt-BR").format(new Date())}
