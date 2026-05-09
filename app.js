@@ -107,18 +107,8 @@ function setKanbanView(mode) {
 
   document.body.classList.toggle("overview-mode", isOverview);
 
-  viewOverview?.classList.toggle("active", isOverview);
-  viewDetailed?.classList.toggle("active", !isOverview);
+  document.querySelector("#viewOverview")?.classList.toggle("active", isOverview);
+  document.querySelector("#viewDetailed")?.classList.toggle("active", !isOverview);
 
   localStorage.setItem("kanbanViewMode", mode);
 }
-
-viewOverview?.addEventListener("click", () => {
-  setKanbanView("overview");
-});
-
-viewDetailed?.addEventListener("click", () => {
-  setKanbanView("detailed");
-});
-
-setKanbanView(localStorage.getItem("kanbanViewMode") || "overview");
