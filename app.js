@@ -98,6 +98,33 @@ if (dom.filterToggle && dom.filterPanel) {
     dom.filterPanel.classList.add("hidden");
   });
 }
+function updateFilterButtonLabel() {
+  const labels = [];
+
+  if (dom.respF?.value) {
+    labels.push(memberName(dom.respF.value));
+  }
+
+  if (dom.prioF?.value) {
+    labels.push(PRIORITY[dom.prioF.value] || dom.prioF.value);
+  }
+
+  if (dom.stageF?.value) {
+    labels.push(stageLabel(dom.stageF.value));
+  }
+
+  if (activeQuickFilter === "today") {
+    labels.push("Hoje");
+  }
+
+  if (activeQuickFilter === "overdue") {
+    labels.push("Atrasados");
+  }
+
+  dom.filterToggle.textContent = labels.length
+    ? `Filtros: ${labels.join(" + ")} ▾`
+    : "☷ Filtros ▾";
+}
 let supabase=null, session=null, member=null, members=[], tasks=[], channel=null;
 let activeQuickFilter = "";
 const valid=SUPABASE_URL?.startsWith("https://")&&!SUPABASE_URL.includes("SEU-PROJETO")&&SUPABASE_ANON_KEY&&!SUPABASE_ANON_KEY.includes("SUA_CHAVE");
@@ -545,7 +572,16 @@ async function saveTask(e){
 }
 async function deleteTask(){let id=dom.taskId.value;if(!id||!confirm("Excluir este card?"))return;let {error}=await supabase.from("tasks").delete().eq("id",id);if(error)return toast(error.message,"error");dom.dialog.close();await loadTasks()}
 dom.tabs.onclick=e=>{let b=e.target.closest(".tab");if(!b)return;$$(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");$$(".view").forEach(v=>v.classList.remove("active"));$(`#view-${b.dataset.tab}`).classList.add("active");dom.toolbar.style.display=b.dataset.tab==="kanban"||b.dataset.tab==="clientes"?"flex":"none"}
-dom.newBtn.onclick=()=>openTask();dom.addClient.onclick=()=>openTask();dom.close.onclick=()=>dom.dialog.close();dom.cancel.onclick=()=>dom.dialog.close();dom.del.onclick=deleteTask;dom.form.onsubmit=saveTask;[dom.search,dom.respF,dom.prioF,dom.stageF].forEach(el=>el.oninput=renderAll);dom.quickFilterButtons.forEach(button => {
+dom.newBtn.onclick=()=>openTask();dom.addClient.onclick=()=>openTask();dom.close.onclick=()=>dom.dialog.close();dom.cancel.onclick=()=>dom.dialog.close();dom.del.onclick=deleteTask;dom.form.onsubmit=saveTask;[dom.search, dom.respF, dom.prioF, dom.stageF].forEach(el => {
+  el.oninput = () => {
+    updateFilterButtonLabel();
+    renderAll();
+
+    if (el !== dom.search) {
+      dom.filterPanel.classList.add("hidden");
+    }
+  };
+});dom.quickFilterButtons.forEach(button => {
   button.onclick = () => {
     activeQuickFilter = button.dataset.quickFilter || "";
 
