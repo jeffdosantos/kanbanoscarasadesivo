@@ -499,3 +499,46 @@
 .hero-info span {
   font-size: 14px;
 }
+.tabs {
+  align-items: center;
+}
+
+.tabs-spacer {
+  flex: 1;
+}
+
+.tabs-search {
+  position: relative;
+  width: 340px;
+  flex: 0 0 340px;
+}
+
+.tabs-search .search {
+  width: 100%;
+  min-width: 0 !important;
+  height: 38px;
+  padding-left: 36px;
+  border-radius: 12px;
+}
+
+.tabs-search .search-icon {
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #94a3b8;
+  z-index: 1;
+}
+
+.tabs .filter-toggle {
+  height: 38px;
+  padding: 0 14px;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.minimal-toolbar {
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+}
