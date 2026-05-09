@@ -38,7 +38,7 @@ auth:$("#authScreen"),app:$("#app"),warning:$("#setupWarning"),login:$("#loginFo
 week:$("#weekRange"),updated:$("#updatedDate"),organizer:$("#organizer"),quick:$("#quickStats"),tabs:$("#tabs"),toolbar:$(".toolbar"),
 newBtn:$("#newTaskButton"),refresh:$("#refreshButton"),logout:$("#logoutButton"),search:$("#searchInput"),respF:$("#responsavelFilter"),prioF:$("#priorityFilter"),stageF:$("#stageFilter"),
 board:$("#board"),clientBody:$("#clientTableBody"),team:$("#teamGrid"),weekDead:$("#weekDeadlines"),urg:$("#realUrgencies"),blockers:$("#blockerGrid"),metrics:$("#metricsGrid"),archive:$("#archiveGrid"),
-dialog:$("#taskDialog"),form:$("#taskForm"),title:$("#dialogTitle"),taskId:$("#taskId"),close:$("#closeDialogButton"),cancel:$("#cancelTaskButton"),del:$("#deleteTaskButton"),
+dialog:$("#taskDialog"),detailsDialog: $("#detailsDialog"),detailsBody: $("#detailsBody"),closeDetails: $("#closeDetailsButton"),form:$("#taskForm"),title:$("#dialogTitle"),taskId:$("#taskId"),close:$("#closeDialogButton"),cancel:$("#cancelTaskButton"),del:$("#deleteTaskButton"),
 tipo:$("#tipoDemandaSelect"),resp:$("#responsavelSelect"),rev:$("#revisorSelect"),etapa:$("#etapaSelect"),addClient:$("#addClientTaskButton"),checkin:$("#checkinGrid"),rules:$("#rulesList")
 };
 let supabase=null, session=null, member=null, members=[], tasks=[], channel=null;
@@ -83,7 +83,20 @@ function card(t){let chk=Array.isArray(t.checklist)?t.checklist:[],done=chk.filt
 <div class="tags"><span class="tag status-${esc(t.status||"em_andamento")}">${STATUS[t.status]||"Em andamento"}</span><span class="due-line">🗓️ ${fmt(t.prazo)}</span></div>
 <div class="progress"><span style="width:${pct}%"></span></div><div class="muted">${doneN}/${total} itens</div>
 ${t.proxima_acao?`<div class="next-action">→ ${esc(t.proxima_acao)}</div>`:""}</article>`}
-function attachDrag(){$$(".task-card").forEach(el=>{el.addEventListener("dragstart",e=>{el.classList.add("dragging");e.dataTransfer.setData("text/plain",el.dataset.id)});el.addEventListener("dragend",()=>el.classList.remove("dragging"))});$$("[data-edit]").forEach(b=>b.onclick=()=>openTask(tasks.find(t=>t.id===b.dataset.edit)));$$(".column").forEach(col=>{col.ondragover=e=>e.preventDefault();col.ondrop=async e=>{e.preventDefault();let id=e.dataTransfer.getData("text/plain"),etapa=col.dataset.stage;await moveTask(id,etapa)}})}
+function attachDrag(){$$(".task-card").forEach(el=>{el.addEventListener("dragstart",e=>{el.classList.add("dragging");e.dataTransfer.setData("text/plain",el.dataset.id)});el.addEventListener("dragend",()=>el.classList.remove("dragging"))});$$(".task-card").forEach(cardEl => {
+  cardEl.onclick = e => {
+    if (e.target.closest("[data-edit]")) return;
+    openDetails(tasks.find(t => t.id === cardEl.dataset.id));
+  };
+});
+
+$$("[data-edit]").forEach(b => {
+  b.onclick = e => {
+    e.stopPropagation();
+    openTask(tasks.find(t => t.id === b.dataset.edit));
+  };
+});
+$$(".column").forEach(col=>{col.ondragover=e=>e.preventDefault();col.ondrop=async e=>{e.preventDefault();let id=e.dataTransfer.getData("text/plain"),etapa=col.dataset.stage;await moveTask(id,etapa)}})}
 async function moveTask(id,etapa){let patch={etapa,status:statusFromStage(etapa),updated_by:session?.user?.email||null,bloqueado:etapa==="bloqueado"};let {error}=await supabase.from("tasks").update(patch).eq("id",id);if(error)return toast(error.message,"error");tasks=tasks.map(t=>t.id===id?{...t,...patch}:t);renderAll()}
 function renderClients(){dom.clientBody.innerHTML=filtered().filter(t=>!isDone(t)).map(t=>`<tr><td>${esc(t.cliente)}</td><td>${esc(t.titulo)}</td><td><span class="pill blue">${esc(memberName(t.responsavel_id))}</span></td><td>${esc(stageLabel(t.etapa))}</td><td>🗓️ ${fmt(t.prazo)}</td><td><span class="pill ${esc(t.prioridade||"media")}">● ${PRIORITY[t.prioridade]||"Média"}</span></td><td><span class="pill ${t.status==="revisao_interna"?"purple":t.status==="aguardando_cliente"?"grey":t.status==="bloqueado"?"red":t.status==="aprovado"?"green":"blue"}">${STATUS[t.status]||"Em andamento"}</span></td><td>→ ${esc(t.proxima_acao||"—")}</td><td><button class="card-menu" data-edit="${t.id}">✎</button></td></tr>`).join("");$$("[data-edit]").forEach(b=>b.onclick=()=>openTask(tasks.find(t=>t.id===b.dataset.edit)))}
 function renderTeam(){dom.team.innerHTML=members.map(m=>{let mine=tasks.filter(t=>t.responsavel_id===m.id&&!isDone(t)),doing=mine.filter(t=>["criacao","revisao","ajustes"].includes(t.etapa)).length,cap=Math.min(100,doing/4*100);return `<div class="team-card" style="--member:${esc(m.cor||"#2563eb")}"><div class="team-avatar">♙</div><h3>${esc(m.nome)}</h3><p class="muted">${esc(m.funcao||"Designer")}</p><div class="team-row"><span>Demandas ativas</span><span class="pill blue">${mine.length}</span></div><div class="team-row"><span>Cards em andamento</span><span class="pill grey">${doing}/4</span></div><p class="muted">Capacidade da semana</p><div class="capacity"><span style="width:${cap}%"></span></div><p class="muted">Observações<br>—</p></div>`}).join("")}
@@ -115,6 +128,159 @@ function renderChecklist(list = []) {
       <span>${esc(item.text)}</span>
     </label>
   `).join("");
+}
+function openDetails(t) {
+  if (!t || !dom.detailsDialog || !dom.detailsBody) return;
+
+  const chk = Array.isArray(t.checklist) ? t.checklist : DEFAULT_CHECKLIST.map(text => ({ text, done: false }));
+  const done = chk.filter(i => i.done || i.concluido).length;
+  const total = chk.length || 13;
+
+  dom.detailsBody.innerHTML = `
+    <div class="details-hero">
+      <div class="details-tags">
+        <span class="tag ${esc(t.prioridade || "media")}">● ${PRIORITY[t.prioridade] || "Média"}</span>
+        <span class="tag status-${esc(t.status || "em_andamento")}">${STATUS[t.status] || "Em andamento"}</span>
+      </div>
+      <p class="client-name">${esc(t.cliente)}</p>
+      <h2>${esc(t.titulo)}</h2>
+    </div>
+
+    <div class="details-grid">
+      <div class="details-info">
+        <div class="details-field">
+          <span>Cliente</span>
+          <strong>${esc(t.cliente || "—")}</strong>
+        </div>
+
+        <div class="details-field">
+          <span>Tipo de peça</span>
+          <strong>${esc(t.tipo_demanda || "—")}</strong>
+        </div>
+
+        <div class="details-field">
+          <span>Responsável principal</span>
+          <strong>${esc(memberName(t.responsavel_id))}</strong>
+        </div>
+
+        <div class="details-field">
+          <span>Apoio / Revisor</span>
+          <strong>${esc(memberName(t.revisor_id))}</strong>
+        </div>
+
+        <div class="details-field">
+          <span>Prazo final</span>
+          <strong>${fmt(t.prazo)}</strong>
+        </div>
+
+        <div class="details-field">
+          <span>Data de entrada</span>
+          <strong>${fmt(t.data_entrada)}</strong>
+        </div>
+
+        <div class="details-field">
+          <span>Canal de solicitação</span>
+          <strong>${esc(t.canal_solicitacao || "—")}</strong>
+        </div>
+
+        <div class="details-field">
+          <span>Próxima ação</span>
+          <strong>${esc(t.proxima_acao || "—")}</strong>
+        </div>
+
+        <div class="details-field">
+          <span>Observações importantes</span>
+          <strong>${esc(t.observacoes || "—")}</strong>
+        </div>
+
+        <div class="details-field">
+          <span>Etapa atual</span>
+          <strong>${esc(stageLabel(t.etapa))}</strong>
+        </div>
+
+        <div class="details-field">
+          <span>Link do briefing</span>
+          ${t.link_briefing ? `<a href="${esc(t.link_briefing)}" target="_blank">Abrir briefing</a>` : "<strong>—</strong>"}
+        </div>
+
+        <div class="details-field">
+          <span>Link dos arquivos</span>
+          ${t.link_arquivos ? `<a href="${esc(t.link_arquivos)}" target="_blank">Abrir arquivos</a>` : "<strong>—</strong>"}
+        </div>
+
+        <div class="details-field">
+          <span>Link Figma/Drive</span>
+          ${t.link_figma_drive ? `<a href="${esc(t.link_figma_drive)}" target="_blank">Abrir link</a>` : "<strong>—</strong>"}
+        </div>
+      </div>
+
+      <div>
+        <div class="details-check-head">
+          <span>▦ Checklist</span>
+          <span>${done}/${total}</span>
+        </div>
+
+        <div class="progress">
+          <span style="width:${Math.round((done / total) * 100)}%"></span>
+        </div>
+
+        <div class="details-checklist">
+          ${chk.map((item, index) => `
+            <label class="details-check-item">
+              <input type="checkbox" data-detail-check="${index}" ${item.done || item.concluido ? "checked" : ""}>
+              <span>${esc(item.text)}</span>
+            </label>
+          `).join("")}
+        </div>
+      </div>
+    </div>
+
+    <div class="details-footer">
+      <button class="btn danger" type="button" id="detailsDelete">🗑️ Excluir</button>
+      <button class="btn primary" type="button" id="detailsEdit">✎ Editar</button>
+    </div>
+  `;
+
+  $("#detailsEdit").onclick = () => {
+    dom.detailsDialog.close();
+    openTask(t);
+  };
+
+  $("#detailsDelete").onclick = async () => {
+    dom.detailsDialog.close();
+    dom.taskId.value = t.id;
+    await deleteTask();
+  };
+
+  dom.detailsBody.querySelectorAll("[data-detail-check]").forEach(input => {
+    input.addEventListener("change", async () => {
+      const index = Number(input.dataset.detailCheck);
+      const updatedChecklist = chk.map((item, i) => ({
+        ...item,
+        done: i === index ? input.checked : !!(item.done || item.concluido)
+      }));
+
+      const { error } = await supabase
+        .from("tasks")
+        .update({
+          checklist: updatedChecklist,
+          updated_by: session?.user?.email || null
+        })
+        .eq("id", t.id);
+
+      if (error) {
+        toast(error.message, "error");
+        return;
+      }
+
+      t.checklist = updatedChecklist;
+      tasks = tasks.map(item => item.id === t.id ? { ...item, checklist: updatedChecklist } : item);
+      renderAll();
+      openDetails(t);
+    });
+  });
+
+  dom.detailsDialog.showModal();
 }
 function openTask(t=null){dom.form.reset();dom.del.style.display=t?"inline-flex":"none";dom.title.textContent=t?"Editar card":"Novo card";dom.taskId.value=t?.id||"";if(t){Object.entries(t).forEach(([k,v])=>{let f=dom.form.elements[k];if(!f)return;if(f.type==="checkbox")f.checked=!!v;else f.value=v??""})}else{dom.form.elements.data_entrada.value=today();dom.form.elements.etapa.value="entrada"}renderChecklist(t?.checklist || []);dom.dialog.showModal()}
 async function saveTask(e){
@@ -180,4 +346,7 @@ if (board) {
     },
     { passive: false }
   );
+}
+if (dom.closeDetails) {
+  dom.closeDetails.onclick = () => dom.detailsDialog.close();
 }
