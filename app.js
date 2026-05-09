@@ -177,26 +177,85 @@ function card(t){let chk=Array.isArray(t.checklist)?t.checklist:[],done=chk.filt
 <div class="tags"><span class="tag status-${esc(t.status||"em_andamento")}">${STATUS[t.status]||"Em andamento"}</span><span class="due-line">🗓️ ${fmt(t.prazo)}</span></div>
 <div class="progress"><span style="width:${pct}%"></span></div><div class="muted">${doneN}/${total} itens</div>
 ${t.proxima_acao?`<div class="next-action">→ ${esc(t.proxima_acao)}</div>`:""}</article>`}
-function attachDrag(){$$(".task-card").forEach(el=>{el.addEventListener("dragstart",e=>{el.classList.add("dragging");e.dataTransfer.setData("text/plain",el.dataset.id)});el.addEventListener("dragend",()=>el.classList.remove("dragging"))});$$(".task-card").forEach(cardEl => {
-  cardEl.onclick = e => {
-    if (e.target.closest("[data-edit]")) return;
-    openDetails(tasks.find(t => t.id === cardEl.dataset.id));
-    $$("[data-edit]").forEach(b => {
-  b.onclick = e => {
-    e.stopPropagation();
-    openTask(tasks.find(t => t.id === b.dataset.edit));
-  };
-});
-$$(".column").forEach(col=>{col.ondragover=e=>e.preventDefault();col.ondrop=async e=>{e.preventDefault();let id=e.dataTransfer.getData("text/plain"),etapa=col.dataset.stage;await moveTask(id,etapa)}})}$$("[data-add-stage]").forEach(btn => {
-  btn.onclick = () => {
-    openTask();
+function attachDrag() {
 
-    setTimeout(() => {
-      if (dom.form?.elements?.etapa) {
-        dom.form.elements.etapa.value = btn.dataset.addStage;
-      }
-    }, 50);
+  $$(".task-card").forEach(el => {
+
+    el.addEventListener("dragstart", e => {
+      el.classList.add("dragging");
+      e.dataTransfer.setData("text/plain", el.dataset.id);
+    });
+
+    el.addEventListener("dragend", () => {
+      el.classList.remove("dragging");
+    });
+
   });
+
+  $$(".task-card").forEach(cardEl => {
+
+    cardEl.onclick = e => {
+
+      if (e.target.closest("[data-edit]")) return;
+
+      openDetails(
+        tasks.find(t => t.id === cardEl.dataset.id)
+      );
+    };
+
+  });
+
+  $$("[data-edit]").forEach(btn => {
+
+    btn.onclick = e => {
+
+      e.stopPropagation();
+
+      openTask(
+        tasks.find(t => t.id === btn.dataset.edit)
+      );
+
+    };
+
+  });
+
+  $$(".column").forEach(col => {
+
+    col.ondragover = e => e.preventDefault();
+
+    col.ondrop = async e => {
+
+      e.preventDefault();
+
+      let id = e.dataTransfer.getData("text/plain");
+
+      let etapa = col.dataset.stage;
+
+      await moveTask(id, etapa);
+
+    };
+
+  });
+
+  $$("[data-add-stage]").forEach(btn => {
+
+    btn.onclick = () => {
+
+      openTask();
+
+      setTimeout(() => {
+
+        if (dom.form?.elements?.etapa) {
+          dom.form.elements.etapa.value =
+            btn.dataset.addStage;
+        }
+
+      }, 50);
+
+    };
+
+  });
+
 }
 async function moveTask(id,etapa){let patch={etapa,status:statusFromStage(etapa),updated_by:session?.user?.email||null,bloqueado:etapa==="bloqueado"};let {error}=await supabase.from("tasks").update(patch).eq("id",id);if(error)return toast(error.message,"error");tasks=tasks.map(t=>t.id===id?{...t,...patch}:t);renderAll()}
 function renderClients(){dom.clientBody.innerHTML=filtered().filter(t=>!isDone(t)).map(t=>`<tr><td>${esc(t.cliente)}</td><td>${esc(t.titulo)}</td><td><span class="pill blue">${esc(memberName(t.responsavel_id))}</span></td><td>${esc(stageLabel(t.etapa))}</td><td>🗓️ ${fmt(t.prazo)}</td><td><span class="pill ${esc(t.prioridade||"media")}">● ${PRIORITY[t.prioridade]||"Média"}</span></td><td><span class="pill ${t.status==="revisao_interna"?"purple":t.status==="aguardando_cliente"?"grey":t.status==="bloqueado"?"red":t.status==="aprovado"?"green":"blue"}">${STATUS[t.status]||"Em andamento"}</span></td><td>→ ${esc(t.proxima_acao||"—")}</td><td><button class="card-menu" data-edit="${t.id}">✎</button></td></tr>`).join("");$$("[data-edit]").forEach(b=>b.onclick=()=>openTask(tasks.find(t=>t.id===b.dataset.edit)))}
