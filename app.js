@@ -99,5 +99,3 @@ if (board) {
   );
 }
 
-  localStorage.setItem("kanbanViewMode", mode);
-}
