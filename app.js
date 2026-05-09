@@ -370,7 +370,65 @@ function attachDrag() {
 }
 async function moveTask(id,etapa){let patch={etapa,status:statusFromStage(etapa),updated_by:session?.user?.email||null,bloqueado:etapa==="bloqueado"};let {error}=await supabase.from("tasks").update(patch).eq("id",id);if(error)return toast(error.message,"error");tasks=tasks.map(t=>t.id===id?{...t,...patch}:t);renderAll()}
 function renderClients(){dom.clientBody.innerHTML=filtered().filter(t=>!isDone(t)).map(t=>`<tr><td>${esc(t.cliente)}</td><td>${esc(t.titulo)}</td><td><span class="pill blue">${esc(memberName(t.responsavel_id))}</span></td><td>${esc(stageLabel(t.etapa))}</td><td>🗓️ ${fmt(t.prazo)}</td><td><span class="pill ${esc(t.prioridade||"media")}">● ${PRIORITY[t.prioridade]||"Média"}</span></td><td><span class="pill ${t.status==="revisao_interna"?"purple":t.status==="aguardando_cliente"?"grey":t.status==="bloqueado"?"red":t.status==="aprovado"?"green":"blue"}">${STATUS[t.status]||"Em andamento"}</span></td><td>→ ${esc(t.proxima_acao||"—")}</td><td><button class="card-menu" data-edit="${t.id}">✎</button></td></tr>`).join("");$$("[data-edit]").forEach(b=>b.onclick=()=>openTask(tasks.find(t=>t.id===b.dataset.edit)))}
-function renderTeam(){dom.team.innerHTML=members.map(m=>{let mine=tasks.filter(t=>t.responsavel_id===m.id&&!isDone(t)),doing=mine.filter(t=>["criacao","revisao","ajustes"].includes(t.etapa)).length,cap=Math.min(100,doing/4*100);return `<div class="team-card" style="--member:${esc(m.cor||"#2563eb")}"><div class="team-avatar">♙</div><h3>${esc(m.nome)}</h3><p class="muted">${esc(m.funcao||"Designer")}</p><div class="team-row"><span>Demandas ativas</span><span class="pill blue">${mine.length}</span></div><div class="team-row"><span>Cards em andamento</span><span class="pill grey">${doing}/4</span></div><p class="muted">Capacidade da semana</p><div class="capacity"><span style="width:${cap}%"></span></div><p class="muted">Observações<br>—</p></div>`}).join("")}
+function renderTeam() {
+  dom.team.innerHTML = members.map(m => {
+    const mine = tasks.filter(t =>
+      t.responsavel_id === m.id &&
+      !isDone(t)
+    );
+
+    const inProgress = mine.filter(t =>
+      !["entrada", "entregue", "arquivado"].includes(t.etapa)
+    );
+
+    const blocked = mine.filter(isBlocked).length;
+    const overdueCount = mine.filter(overdue).length;
+
+    const cap = Math.min(100, inProgress.length / 4 * 100);
+
+    return `
+      <div class="team-card" style="--member:${esc(m.cor || "#2563eb")}">
+        <div class="team-avatar">♙</div>
+
+        <h3>${esc(m.nome)}</h3>
+        <p class="muted">${esc(m.funcao || "Designer")}</p>
+
+        <div class="team-row">
+          <span>Demandas ativas</span>
+          <span class="pill blue">${mine.length}</span>
+        </div>
+
+        <div class="team-row">
+          <span>Cards em andamento</span>
+          <span class="pill grey">${inProgress.length}/4</span>
+        </div>
+
+        <div class="team-row">
+          <span>Atrasados</span>
+          <span class="pill ${overdueCount ? "red" : "grey"}">${overdueCount}</span>
+        </div>
+
+        <div class="team-row">
+          <span>Bloqueados</span>
+          <span class="pill ${blocked ? "red" : "grey"}">${blocked}</span>
+        </div>
+
+        <p class="muted">Capacidade da semana</p>
+        <div class="capacity">
+          <span style="width:${cap}%"></span>
+        </div>
+
+        <p class="muted">Observações<br>
+          ${
+            inProgress.length > 4
+              ? "⚠️ Acima da capacidade recomendada"
+              : "—"
+          }
+        </p>
+      </div>
+    `;
+  }).join("");
+}
 function renderDeadlines(){let days=[0,1,2,3,4,5].map(i=>addDays(startWeek(),i));dom.weekDead.innerHTML=days.map(d=>{let dayTasks=tasks.filter(t=>t.prazo===d.toISOString().slice(0,10)&&!isDone(t));return `<div class="deadline-card"><h3>🗓️ ${dayName(d)}</h3>${dayTasks.length?dayTasks.map(t=>`<div class="deadline-item"><span class="dot"></span><div>${esc(t.titulo)}<br><span class="muted">${esc(t.cliente)}</span></div></div>`).join(""):`<p class="muted" style="text-align:center;margin-top:30px">Sem vencimentos</p>`}</div>`}).join("");let urg=tasks.filter(t=>(t.prioridade==="urgente"||overdue(t))&&!isDone(t));dom.urg.innerHTML=urg.length?urg.map(t=>`<div class="deadline-item"><span class="dot"></span><div>${esc(t.titulo)} — ${esc(t.cliente)}<br><span>${esc(t.proxima_acao||"resolver prioridade")}</span></div></div>`).join(""):"<p>Nenhuma urgência real no momento.</p>"}
 function renderBlockers(){let list=tasks.filter(t=>isBlocked(t)&&!isDone(t));dom.blockers.innerHTML=list.length?list.map(t=>`<div class="block-card"><h3>${esc(t.titulo)}</h3><p class="muted">${esc(t.cliente)} • ${esc(memberName(t.responsavel_id))}</p><p><strong>Por que está bloqueado?</strong><br>${esc(t.motivo_bloqueio||"Sem motivo registrado")}</p><p><strong>Próxima ação:</strong> ${esc(t.proxima_acao||"Definir destrave")}</p></div>`).join(""):"<div class='info-card'>Nenhum bloqueio registrado.</div>"}
 function renderMetrics(){let newWeek=tasks.filter(t=>date(t.data_entrada)>=startWeek()).length, delivered=tasks.filter(t=>isDone(t)&&dueThisWeek(t)).length, late=tasks.filter(overdue).length, blocked=tasks.filter(isBlocked).length, waiting=tasks.filter(t=>t.status==="aguardando_cliente"||t.etapa==="enviado_cliente").length;let counts=Object.fromEntries(members.map(m=>[m.id,tasks.filter(t=>t.responsavel_id===m.id&&!isDone(t)).length]));let top=members.sort((a,b)=>(counts[b.id]||0)-(counts[a.id]||0))[0];let cards=[["📥",newWeek,"Demandas novas na semana"],["📦",delivered,"Demandas entregues"],["⚠️",late,"Demandas atrasadas"],["🔒",blocked,"Cards bloqueados"],["⏳",waiting,"Cards aguardando cliente"]];dom.metrics.innerHTML=cards.map(([i,n,l])=>`<div class="metric-card"><div class="icon">${i}</div><strong>${n}</strong><span>${l}</span></div>`).join("")+`<div class="metric-card" style="grid-column:span 2"><span>👤 Pessoa com mais demandas</span><p>${esc(top?.nome||"—")} (${top?counts[top.id]:0} demandas)</p></div><div class="metric-card" style="grid-column:span 3"><span>🚧 Principal gargalo da semana</span><p>${waiting?"Aguardando retorno de clientes":blocked?"Bloqueios internos":"Fluxo sem gargalo crítico"}</p></div>`}
