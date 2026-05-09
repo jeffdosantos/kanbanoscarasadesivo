@@ -98,3 +98,27 @@ if (board) {
     { passive: false }
   );
 }
+// Alternador de visualização: Visão Geral / Detalhada
+const viewOverview = document.querySelector("#viewOverview");
+const viewDetailed = document.querySelector("#viewDetailed");
+
+function setKanbanView(mode) {
+  const isOverview = mode === "overview";
+
+  document.body.classList.toggle("overview-mode", isOverview);
+
+  viewOverview?.classList.toggle("active", isOverview);
+  viewDetailed?.classList.toggle("active", !isOverview);
+
+  localStorage.setItem("kanbanViewMode", mode);
+}
+
+viewOverview?.addEventListener("click", () => {
+  setKanbanView("overview");
+});
+
+viewDetailed?.addEventListener("click", () => {
+  setKanbanView("detailed");
+});
+
+setKanbanView(localStorage.getItem("kanbanViewMode") || "overview");
