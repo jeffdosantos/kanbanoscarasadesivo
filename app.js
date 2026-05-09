@@ -384,7 +384,7 @@ function renderTeam() {
     const blocked = mine.filter(isBlocked).length;
     const overdueCount = mine.filter(overdue).length;
 
-    const cap = Math.min(100, inProgress.length / 4 * 100);
+    const cap = Math.min(100, inProgress.length / 10 * 100);
 
     return `
       <div class="team-card" style="--member:${esc(m.cor || "#2563eb")}">
@@ -420,7 +420,7 @@ function renderTeam() {
 
         <p class="muted">Observações<br>
           ${
-            inProgress.length > 4
+            inProgress.length > 10
               ? "⚠️ Acima da capacidade recomendada"
               : "—"
           }
