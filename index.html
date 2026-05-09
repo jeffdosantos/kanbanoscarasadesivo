@@ -72,14 +72,46 @@
     <strong id="overdueCount">0</strong>
     <span>Atrasados</span>
   </div>
-  <button id="refreshButton" class="btn ghost">Atualizar</button>
-    <button id="logoutButton" class="btn ghost">Sair</button>
+
   <div class="flow-pill delivered">
     <span class="pill-dot"></span>
     <strong id="weekDeliveredCount">0</strong>
     <span>Entregas da semana</span>
   </div>
-</section>
+
+  <div class="top-search-actions">
+    <div class="search-wrap">
+      <span class="search-icon">⌕</span>
+      <input id="searchInput" class="search" type="search" placeholder="Buscar por cliente, projeto, responsável..." />
+    </div>
+
+    <div class="filter-dropdown">
+      <button id="filterToggleButton" class="btn ghost filter-toggle" type="button">
+        ☷ Filtros ▾
+      </button>
+
+      <div id="filterPanel" class="filter-panel hidden">
+        <button type="button" class="filter-option" data-quick-filter="">Todos</button>
+        <button type="button" class="filter-option" data-quick-filter="today">Hoje</button>
+        <button type="button" class="filter-option" data-quick-filter="overdue">Atrasados</button>
+
+        <select id="responsavelFilter">
+          <option value="">Todos responsáveis</option>
+        </select>
+
+        <select id="priorityFilter">
+          <option value="">Todas prioridades</option>
+          <option value="urgente">Urgente</option>
+          <option value="alta">Alta</option>
+          <option value="media">Média</option>
+          <option value="baixa">Baixa</option>
+        </select>
+
+        <select id="stageFilter">
+          <option value="">Todas etapas</option>
+        </select>
+      </div>
+    </section>
   <nav class="tabs" id="tabs">
       <button class="tab active" data-tab="kanban">📋 Kanban</button>
       <button class="tab" data-tab="clientes">👥 Clientes</button>
@@ -90,39 +122,7 @@
       <button class="tab" data-tab="regras">📜 Regras</button>
       <button class="tab" data-tab="metricas">📊 Métricas</button>
       <button class="tab" data-tab="arquivo">📦 Arquivo</button>
-   <div class="search-wrap">
-  <span class="search-icon">⌕</span>
-  <input id="searchInput" class="search" type="search" placeholder="Buscar por cliente, projeto, responsável..." />
-</div>
-
-<div class="filter-dropdown">
-  <button id="filterToggleButton" class="btn ghost filter-toggle" type="button">
-    ☷ Filtros ▾
-  </button>
-
-  <div id="filterPanel" class="filter-panel hidden">
-    <button type="button" class="filter-option" data-quick-filter="">Todos</button>
-    <button type="button" class="filter-option" data-quick-filter="today">Hoje</button>
-    <button type="button" class="filter-option" data-quick-filter="overdue">Atrasados</button>
-
-    <select id="responsavelFilter">
-      <option value="">Todos responsáveis</option>
-    </select>
-
-    <select id="priorityFilter">
-      <option value="">Todas prioridades</option>
-      <option value="urgente">Urgente</option>
-      <option value="alta">Alta</option>
-      <option value="media">Média</option>
-      <option value="baixa">Baixa</option>
-    </select>
-
-    <select id="stageFilter">
-      <option value="">Todas etapas</option>
-    </select>
-  </div>
-</div>
-    </nav>
+ 
 </section>
   </div>
     <section class="view active" id="view-kanban">
