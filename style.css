@@ -382,3 +382,37 @@
   border-color: #94a3b8;
   color: #0f172a;
 }
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.sync-pill,
+.user-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.sync-pill {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.user-pill {
+  background: #ffffff;
+  color: #334155;
+  border: 1px solid #e5e7eb;
+}
+
+.hero-actions .btn {
+  padding: 8px 12px;
+  border-radius: 999px;
+}
