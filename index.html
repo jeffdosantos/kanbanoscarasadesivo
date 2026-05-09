@@ -58,7 +58,8 @@
     <strong id="overdueCount">0</strong>
     <span>Atrasados</span>
   </div>
-
+  <button id="refreshButton" class="btn ghost">Atualizar</button>
+    <button id="logoutButton" class="btn ghost">Sair</button>
   <div class="flow-pill delivered">
     <span class="pill-dot"></span>
     <strong id="weekDeliveredCount">0</strong>
@@ -86,8 +87,6 @@
     ☷ Filtros
   </button>
 
-  <button id="newTaskButton" class="btn primary">
-
   <div id="filterPanel" class="filter-panel hidden">
     <select id="responsavelFilter">
       <option value="">Todos responsáveis</option>
@@ -104,9 +103,6 @@
     <select id="stageFilter">
       <option value="">Todas etapas</option>
     </select>
-
-    <button id="refreshButton" class="btn ghost">Atualizar</button>
-    <button id="logoutButton" class="btn ghost">Sair</button>
   </div>
     <section class="view active" id="view-kanban">
       <div id="board" class="board"></div>
