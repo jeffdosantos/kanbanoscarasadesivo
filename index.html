@@ -1,262 +1,109 @@
 <!doctype html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Controle de Clientes - Estúdio de Criação</title>
-    <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
-    <div id="toast" class="toast" role="status" aria-live="polite"></div>
-
-    <section id="authScreen" class="auth-screen">
-      <div class="auth-card">
-        <p class="eyebrow">Estúdio de Criação</p>
-        <h1>Controle de Clientes e Fluxo de Produção</h1>
-        <p class="muted">
-          Entre com o e-mail da equipe para acessar o Kanban colaborativo.
-        </p>
-
-        <div id="setupWarning" class="warning hidden">
-          Configure o arquivo <strong>config.js</strong> com a URL e a chave pública anon do Supabase.
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Clientes e Fluxo de Produção</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div id="toast" class="toast"></div>
+  <section id="authScreen" class="auth-screen">
+    <div class="auth-card">
+      <div class="brand-mark">🎨</div>
+      <h1>Controle de Clientes e Fluxo de Produção</h1>
+      <p>Entre com o e-mail da equipe para acessar o quadro colaborativo.</p>
+      <div id="setupWarning" class="warning hidden">Configure o arquivo <strong>config.js</strong> com a URL e a chave pública anon/publishable do Supabase.</div>
+      <form id="loginForm" class="auth-form">
+        <label>E-mail <input id="emailInput" type="email" required placeholder="voce@estudio.com" /></label>
+        <label>Senha <input id="passwordInput" type="password" required minlength="6" placeholder="mínimo 6 caracteres" /></label>
+        <div class="form-actions">
+          <button class="btn primary" type="submit">Entrar</button>
+          <button class="btn ghost" id="signupButton" type="button">Criar acesso</button>
         </div>
-
-        <form id="loginForm" class="auth-form">
-          <label>
-            E-mail
-            <input id="emailInput" type="email" autocomplete="email" required placeholder="voce@estudio.com" />
-          </label>
-          <label>
-            Senha
-            <input id="passwordInput" type="password" autocomplete="current-password" required minlength="6" placeholder="mínimo 6 caracteres" />
-          </label>
-          <div class="auth-actions">
-            <button type="submit" class="button primary">Entrar</button>
-            <button type="button" id="signupButton" class="button ghost">Criar acesso</button>
-          </div>
-          <p class="hint">
-            O e-mail precisa estar cadastrado como membro ativo na tabela <code>team_members</code>.
-          </p>
-        </form>
-      </div>
-    </section>
-
-    <section id="app" class="app hidden">
-      <header class="topbar">
-        <div>
-          <p class="eyebrow">Kanban colaborativo</p>
-          <h1>Controle de Clientes e Fluxo de Produção</h1>
-        </div>
-        <div class="topbar-actions">
-          <span id="currentUser" class="user-pill">Conectando...</span>
-          <button id="refreshButton" class="button secondary">Atualizar</button>
-          <button id="logoutButton" class="button ghost">Sair</button>
-        </div>
-      </header>
-
-      <section class="toolbar">
-        <button id="newTaskButton" class="button primary">+ Novo card</button>
-        <label class="search-field">
-          Buscar
-          <input id="searchInput" type="search" placeholder="Cliente, projeto ou próxima ação" />
-        </label>
-        <label>
-          Responsável
-          <select id="responsavelFilter">
-            <option value="">Todos</option>
-          </select>
-        </label>
-        <label>
-          Prioridade
-          <select id="priorityFilter">
-            <option value="">Todas</option>
-            <option value="urgente">Urgente</option>
-            <option value="alta">Alta</option>
-            <option value="media">Média</option>
-            <option value="baixa">Baixa</option>
-          </select>
-        </label>
-        <label>
-          Etapa
-          <select id="stageFilter">
-            <option value="">Todas</option>
-          </select>
-        </label>
-        <label class="check-filter">
-          <input id="overdueFilter" type="checkbox" />
-          Só atrasados
-        </label>
-        <label class="check-filter">
-          <input id="blockedFilter" type="checkbox" />
-          Só bloqueados
-        </label>
-      </section>
-
-      <section class="workspace">
-        <main id="board" class="board" aria-label="Quadro Kanban"></main>
-
-        <aside class="sidebar">
-          <section class="panel">
-            <div class="panel-header">
-              <h2>Indicadores</h2>
-              <span class="muted">semana atual</span>
-            </div>
-            <div id="metrics" class="metrics"></div>
-          </section>
-
-          <section class="panel">
-            <div class="panel-header">
-              <h2>Prazos críticos</h2>
-              <span class="muted">próximos 7 dias</span>
-            </div>
-            <div id="deadlines" class="compact-list"></div>
-          </section>
-
-          <section class="panel">
-            <div class="panel-header">
-              <h2>Bloqueios</h2>
-              <span class="muted">precisam de decisão</span>
-            </div>
-            <div id="blockers" class="compact-list"></div>
-          </section>
-
-          <section class="panel wide-panel">
-            <div class="panel-header">
-              <h2>Visão por cliente</h2>
-              <span class="muted">resumo ativo</span>
-            </div>
-            <div class="table-scroll">
-              <table id="clientTable">
-                <thead>
-                  <tr>
-                    <th>Cliente</th>
-                    <th>Demanda</th>
-                    <th>Resp.</th>
-                    <th>Etapa</th>
-                    <th>Prazo</th>
-                    <th>Próxima ação</th>
-                  </tr>
-                </thead>
-                <tbody></tbody>
-              </table>
-            </div>
-          </section>
-        </aside>
-      </section>
-    </section>
-
-    <dialog id="taskDialog" class="task-dialog">
-      <form id="taskForm" method="dialog">
-        <div class="dialog-header">
-          <div>
-            <p class="eyebrow">Card de demanda</p>
-            <h2 id="dialogTitle">Novo card</h2>
-          </div>
-          <button type="button" id="closeDialogButton" class="icon-button" aria-label="Fechar">×</button>
-        </div>
-
-        <input type="hidden" name="id" id="taskId" />
-
-        <div class="form-grid">
-          <label>
-            Cliente *
-            <input name="cliente" required placeholder="Ex.: Cliente A" />
-          </label>
-          <label>
-            Projeto / demanda *
-            <input name="titulo" required placeholder="Ex.: Carrossel institucional" />
-          </label>
-          <label>
-            Tipo de peça
-            <select name="tipo_demanda" id="tipoDemandaSelect"></select>
-          </label>
-          <label>
-            Responsável principal
-            <select name="responsavel_id" id="responsavelSelect"></select>
-          </label>
-          <label>
-            Apoio / revisor
-            <select name="revisor_id" id="revisorSelect"></select>
-          </label>
-          <label>
-            Prioridade
-            <select name="prioridade">
-              <option value="urgente">Urgente</option>
-              <option value="alta">Alta</option>
-              <option value="media" selected>Média</option>
-              <option value="baixa">Baixa</option>
-            </select>
-          </label>
-          <label>
-            Prazo final
-            <input name="prazo" type="date" />
-          </label>
-          <label>
-            Data de entrada
-            <input name="data_entrada" type="date" />
-          </label>
-          <label>
-            Etapa atual
-            <select name="etapa" id="etapaSelect"></select>
-          </label>
-          <label>
-            Status
-            <select name="status">
-              <option value="em_andamento">Em andamento</option>
-              <option value="revisao_interna">Revisão interna</option>
-              <option value="aguardando_cliente">Aguardando cliente</option>
-              <option value="bloqueado">Bloqueado</option>
-              <option value="aprovado">Aprovado</option>
-              <option value="entregue">Entregue</option>
-            </select>
-          </label>
-          <label>
-            Canal de solicitação
-            <input name="canal_solicitacao" placeholder="WhatsApp, e-mail, reunião..." />
-          </label>
-          <label>
-            Próxima ação
-            <input name="proxima_acao" placeholder="Ex.: enviar primeira versão" />
-          </label>
-          <label>
-            Link do briefing
-            <input name="link_briefing" type="url" placeholder="https://" />
-          </label>
-          <label>
-            Link dos arquivos
-            <input name="link_arquivos" type="url" placeholder="https://" />
-          </label>
-          <label>
-            Link Figma / Drive
-            <input name="link_figma_drive" type="url" placeholder="https://" />
-          </label>
-          <label class="checkbox-row">
-            <input name="bloqueado" type="checkbox" />
-            Marcar como bloqueado
-          </label>
-          <label class="full">
-            Motivo do bloqueio
-            <input name="motivo_bloqueio" placeholder="O que impede esse card de andar?" />
-          </label>
-          <label class="full">
-            Observações importantes
-            <textarea name="observacoes" rows="3" placeholder="Informações que a equipe precisa saber"></textarea>
-          </label>
-          <label class="full">
-            Checklist — uma linha por item
-            <textarea name="checklist_text" rows="5" placeholder="Briefing recebido&#10;Textos recebidos&#10;Revisão interna feita&#10;Enviado ao cliente"></textarea>
-          </label>
-        </div>
-
-        <div class="dialog-actions">
-          <button type="button" id="deleteTaskButton" class="button danger hidden">Excluir</button>
-          <span class="spacer"></span>
-          <button type="button" id="cancelTaskButton" class="button ghost">Cancelar</button>
-          <button type="submit" class="button primary">Salvar card</button>
-        </div>
+        <small>O e-mail precisa estar cadastrado na tabela <code>team_members</code>.</small>
       </form>
-    </dialog>
+    </div>
+  </section>
 
-    <script type="module" src="app.js"></script>
-  </body>
+  <main id="app" class="app hidden">
+    <header class="hero">
+      <div class="hero-title">
+        <span class="brand-mark small">🎨</span>
+        <div>
+          <h1>Controle de Clientes e Fluxo de Produção — Estúdio de Criação</h1>
+          <p>Quadro para acompanhar demandas de clientes, etapas criativas, responsáveis, prazos, aprovações, bloqueios e entregas.</p>
+        </div>
+      </div>
+      <div class="hero-info">
+        <span>🗓️ Semana: <strong id="weekRange">—</strong></span>
+        <span>👤 Org. do quadro: <strong id="organizer">Pessoa 1</strong></span>
+        <span>⏱️ Atualizado em: <strong id="updatedDate">—</strong></span>
+        <span>📣 Reunião: <strong>Daily às 09h30</strong></span>
+      </div>
+    </header>
+    <section class="quick-stats" id="quickStats"></section>
+    <nav class="tabs" id="tabs">
+      <button class="tab active" data-tab="kanban">📋 Kanban</button>
+      <button class="tab" data-tab="clientes">👥 Clientes</button>
+      <button class="tab" data-tab="equipe">🧑‍🎨 Equipe</button>
+      <button class="tab" data-tab="prazos">🗓️ Prazos</button>
+      <button class="tab" data-tab="bloqueios">🔒 Bloqueios</button>
+      <button class="tab" data-tab="checkin">✅ Check-in</button>
+      <button class="tab" data-tab="regras">📜 Regras</button>
+      <button class="tab" data-tab="metricas">📊 Métricas</button>
+      <button class="tab" data-tab="arquivo">📦 Arquivo</button>
+    </nav>
+    <section class="toolbar">
+      <button id="newTaskButton" class="btn primary">+ Novo card</button>
+      <input id="searchInput" class="search" type="search" placeholder="Buscar cliente, projeto ou próxima ação..." />
+      <select id="responsavelFilter"><option value="">Todos responsáveis</option></select>
+      <select id="priorityFilter"><option value="">Todas prioridades</option><option value="urgente">Urgente</option><option value="alta">Alta</option><option value="media">Média</option><option value="baixa">Baixa</option></select>
+      <select id="stageFilter"><option value="">Todas etapas</option></select>
+      <button id="refreshButton" class="btn ghost">Atualizar</button>
+      <button id="logoutButton" class="btn ghost">Sair</button>
+    </section>
+
+    <section class="view active" id="view-kanban">
+      <details class="legend-card" open>
+        <summary>🎨 Legenda Visual — Prioridades, Status e Tipos</summary>
+        <div class="legend-grid">
+          <span class="pill urgente">● Urgente</span><span class="pill alta">● Alta</span><span class="pill media">● Média</span><span class="pill baixa">● Baixa</span>
+          <span class="pill blue">Em andamento</span><span class="pill purple">Em revisão</span><span class="pill grey">Aguardando cliente</span><span class="pill red">Bloqueado</span><span class="pill green">Aprovado / entregue</span>
+        </div>
+      </details>
+      <div id="board" class="board"></div>
+    </section>
+    <section class="view" id="view-clientes">
+      <div class="section-head"><div><h2>Clientes Ativos</h2><p>Visão resumida para saber rapidamente o que está acontecendo com cada cliente.</p></div><button class="btn primary" id="addClientTaskButton">+ Adicionar cliente</button></div>
+      <div class="table-card"><table><thead><tr><th>Cliente</th><th>Projeto / Demanda</th><th>Responsável</th><th>Etapa atual</th><th>Prazo</th><th>Prioridade</th><th>Situação</th><th>Próxima ação</th><th></th></tr></thead><tbody id="clientTableBody"></tbody></table></div>
+    </section>
+    <section class="view" id="view-equipe"><div class="section-head"><div><h2>Equipe e Responsáveis</h2><p>Cada demanda deve ter apenas um responsável principal, mesmo que outras pessoas apoiem.</p></div></div><div id="teamGrid" class="team-grid"></div></section>
+    <section class="view" id="view-prazos"><div class="section-head"><div><h2>Prazos Críticos da Semana</h2><p>Tudo que vence na semana deve aparecer aqui, mesmo que o card esteja no Kanban.</p></div></div><div id="weekDeadlines" class="week-grid"></div><div class="urgent-box"><h3>🛑 Urgências Reais</h3><p>Só entra aqui o que impacta diretamente entrega, cliente importante, campanha no ar ou prazo comercial crítico.</p><div id="realUrgencies"></div></div></section>
+    <section class="view" id="view-bloqueios"><div class="section-head"><div><h2>Bloqueios que precisam de decisão</h2><p>Demandas travadas por falta de informação, aprovação, material, decisão ou conflito de prioridade.</p></div></div><div id="blockerGrid" class="list-grid"></div></section>
+    <section class="view" id="view-checkin"><div class="section-head"><div><h2>Check-in da Equipe</h2><p>A reunião deve atualizar o quadro, não apenas conversar sobre tarefas.</p></div></div><div class="checkin-grid" id="checkinGrid"></div></section>
+    <section class="view" id="view-regras"><div class="section-head"><div><h2>Regras de uso do quadro</h2><p>O sistema só funciona se toda a equipe atualizar o fluxo diariamente.</p></div></div><div class="rules-card"><ol id="rulesList"></ol></div></section>
+    <section class="view" id="view-metricas"><div class="section-head"><div><h2>Indicadores do Fluxo</h2><p>Esses indicadores ajudam a perceber acúmulos, atrasos e sobrecarga antes que virem problema.</p></div><button class="btn ghost">✎ Editar indicadores</button></div><div id="metricsGrid" class="metrics-grid"></div><div class="note">💡 Atualize esses indicadores semanalmente durante o check-in da equipe. Eles ajudam a visualizar padrões e tomar decisões antes que os problemas escalem.</div></section>
+    <section class="view" id="view-arquivo"><div class="section-head"><div><h2>Arquivo / Concluídos do Mês</h2><p>Cards entregues e conferidos ficam aqui.</p></div></div><div id="archiveGrid" class="list-grid"></div></section>
+  </main>
+
+  <dialog id="taskDialog" class="modal">
+    <form id="taskForm" method="dialog">
+      <div class="modal-head"><div><small>Card de demanda</small><h2 id="dialogTitle">Novo card</h2></div><button type="button" id="closeDialogButton" class="icon-btn">×</button></div>
+      <input type="hidden" name="id" id="taskId" />
+      <div class="form-grid">
+        <label>Cliente *<input name="cliente" required /></label><label>Projeto / demanda *<input name="titulo" required /></label>
+        <label>Tipo de peça<select name="tipo_demanda" id="tipoDemandaSelect"></select></label><label>Responsável<select name="responsavel_id" id="responsavelSelect"></select></label>
+        <label>Apoio / revisor<select name="revisor_id" id="revisorSelect"></select></label><label>Prioridade<select name="prioridade"><option value="urgente">Urgente</option><option value="alta">Alta</option><option value="media" selected>Média</option><option value="baixa">Baixa</option></select></label>
+        <label>Prazo final<input name="prazo" type="date" /></label><label>Data de entrada<input name="data_entrada" type="date" /></label>
+        <label>Etapa<select name="etapa" id="etapaSelect"></select></label><label>Status<select name="status"><option value="em_andamento">Em andamento</option><option value="revisao_interna">Em revisão</option><option value="aguardando_cliente">Aguardando cliente</option><option value="bloqueado">Bloqueado</option><option value="aprovado">Aprovado</option><option value="entregue">Entregue</option></select></label>
+        <label>Canal<input name="canal_solicitacao" placeholder="WhatsApp, e-mail, reunião..." /></label><label>Próxima ação<input name="proxima_acao" /></label>
+        <label>Link briefing<input name="link_briefing" type="url" /></label><label>Link arquivos<input name="link_arquivos" type="url" /></label><label>Link Figma/Drive<input name="link_figma_drive" type="url" /></label>
+        <label class="check"><input name="bloqueado" type="checkbox" /> Bloqueado</label><label class="full">Motivo do bloqueio<input name="motivo_bloqueio" /></label><label class="full">Observações<textarea name="observacoes" rows="3"></textarea></label>
+      </div>
+      <div class="modal-actions"><button type="button" id="deleteTaskButton" class="btn danger">Excluir</button><span></span><button type="button" id="cancelTaskButton" class="btn ghost">Cancelar</button><button type="submit" class="btn primary">Salvar card</button></div>
+    </form>
+  </dialog>
+  <script type="module" src="app.js"></script>
+</body>
 </html>
