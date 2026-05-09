@@ -86,13 +86,6 @@
       <button id="logoutButton" class="btn ghost">Sair</button>
     </section>
     <section class="view active" id="view-kanban">
-      <details class="legend-card" open>
-        <summary>🎨 Legenda Visual — Prioridades, Status e Tipos</summary>
-        <div class="legend-grid">
-          <span class="pill urgente">● Urgente</span><span class="pill alta">● Alta</span><span class="pill media">● Média</span><span class="pill baixa">● Baixa</span>
-          <span class="pill blue">Em andamento</span><span class="pill purple">Em revisão</span><span class="pill grey">Aguardando cliente</span><span class="pill red">Bloqueado</span><span class="pill green">Aprovado / entregue</span>
-        </div>
-      </details>
       <div id="board" class="board"></div>
     </section>
     <section class="view" id="view-clientes">
@@ -124,6 +117,13 @@
       </div>
       <div class="modal-actions"><button type="button" id="deleteTaskButton" class="btn danger">Excluir</button><span></span><button type="button" id="cancelTaskButton" class="btn ghost">Cancelar</button><button type="submit" class="btn primary">Salvar card</button></div>
     </form>
+    <details class="legend-card" open>
+        <summary>🎨 Legenda Visual — Prioridades, Status e Tipos</summary>
+        <div class="legend-grid">
+          <span class="pill urgente">● Urgente</span><span class="pill alta">● Alta</span><span class="pill media">● Média</span><span class="pill baixa">● Baixa</span>
+          <span class="pill blue">Em andamento</span><span class="pill purple">Em revisão</span><span class="pill grey">Aguardando cliente</span><span class="pill red">Bloqueado</span><span class="pill green">Aprovado / entregue</span>
+        </div>
+      </details>
   </dialog>
   <script type="module" src="app.js"></script>
 </body>
