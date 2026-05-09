@@ -71,18 +71,33 @@
 }
 .flow-highlights {
   display: flex;
-  gap: 12px;
-  margin: 18px 0;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5e7eb;
+  flex-wrap: wrap;
 }
 
 .flow-pill {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 10px;
   padding: 10px 16px;
   border-radius: 999px;
-  background: #ffffff;
+  background: #f8fafc;
   border: 1px solid #e5e7eb;
+}
+
+.flow-pill strong {
+  font-size: 16px;
+  color: #111827;
+}
+
+.flow-pill span:last-child {
+  font-size: 14px;
+  color: #64748b;
+  font-weight: 600;
 }
 
 .pill-dot {
