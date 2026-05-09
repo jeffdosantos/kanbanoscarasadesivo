@@ -98,7 +98,6 @@ if (board) {
     { passive: false }
   );
 }
-// Alternador de visualização: Visão Geral / Detalhada
 const viewOverview = document.querySelector("#viewOverview");
 const viewDetailed = document.querySelector("#viewDetailed");
 
@@ -107,6 +106,28 @@ function setKanbanView(mode) {
 
   document.body.classList.toggle("overview-mode", isOverview);
 
+  if (viewOverview) {
+    viewOverview.classList.toggle("active", isOverview);
+  }
+
+  if (viewDetailed) {
+    viewDetailed.classList.toggle("active", !isOverview);
+  }
+
+  localStorage.setItem("kanbanViewMode", mode);
+}
+
+if (viewOverview && viewDetailed) {
+  viewOverview.addEventListener("click", () => {
+    setKanbanView("overview");
+  });
+
+  viewDetailed.addEventListener("click", () => {
+    setKanbanView("detailed");
+  });
+
+  setKanbanView(localStorage.getItem("kanbanViewMode") || "detailed");
+}
   document.querySelector("#viewOverview")?.classList.toggle("active", isOverview);
   document.querySelector("#viewDetailed")?.classList.toggle("active", !isOverview);
 
