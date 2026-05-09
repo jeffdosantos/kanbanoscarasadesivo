@@ -23,7 +23,9 @@
         </div>
         <small>O e-mail precisa estar cadastrado na tabela <code>team_members</code>.</small>
       </form>
+    </div>
   </section>
+
   <main id="app" class="app hidden">
     <header class="hero">
       <div class="hero-title">
@@ -40,7 +42,7 @@
         <span>📣 Reunião: <strong>Daily às 09h30</strong></span>
       </div>
     </header>
-</div>
+    <section class="quick-stats" id="quickStats"></section>
     <nav class="tabs" id="tabs">
       <button class="tab active" data-tab="kanban">📋 Kanban</button>
       <button class="tab" data-tab="clientes">👥 Clientes</button>
@@ -51,26 +53,6 @@
       <button class="tab" data-tab="regras">📜 Regras</button>
       <button class="tab" data-tab="metricas">📊 Métricas</button>
       <button class="tab" data-tab="arquivo">📦 Arquivo</button>
-      
-  <div class="flow-highlights">
-  <div class="flow-pill today">
-    <span class="pill-dot"></span>
-    <strong id="todayCount">0</strong>
-    <span>Hoje</span>
-  </div>
-        
-  <div class="flow-pill overdue">
-    <span class="pill-dot"></span>
-    <strong id="overdueCount">0</strong>
-    <span>Atrasados</span>
-  </div>
-
-  <div class="flow-pill delivered">
-    <span class="pill-dot"></span>
-    <strong id="weekDeliveredCount">0</strong>
-    <span>Entregas da semana</span>
-  </div>
-</div>
     </nav>
     <section class="toolbar">
       <button id="newTaskButton" class="btn primary">+ Novo card</button>
@@ -82,6 +64,13 @@
       <button id="logoutButton" class="btn ghost">Sair</button>
     </section>
 </div>
+     <div class="view-toggle">
+  <button id="viewOverview" class="view-toggle-btn active" type="button">
+    Visão Geral
+  </button>
+  <button id="viewDetailed" class="view-toggle-btn" type="button">
+    Detalhada
+  </button>
     <section class="view active" id="view-kanban">
       <details class="legend-card" open>
         <summary>🎨 Legenda Visual — Prioridades, Status e Tipos</summary>
