@@ -33,14 +33,18 @@ const DEFAULT_CHECKLIST = [
   "Cliente confirmado"
 ];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
-const dom={
-auth:$("#authScreen"),app:$("#app"),warning:$("#setupWarning"),login:$("#loginForm"),signup:$("#signupButton"),email:$("#emailInput"),pass:$("#passwordInput"),toast:$("#toast"),
+const dom={filterToggle: $("#filterToggleButton"),filterPanel: $("#filterPanel"),auth:$("#authScreen"),app:$("#app"),warning:$("#setupWarning"),login:$("#loginForm"),signup:$("#signupButton"),email:$("#emailInput"),pass:$("#passwordInput"),toast:$("#toast"),
 week:$("#weekRange"),updated:$("#updatedDate"),organizer:$("#organizer"),quick:$("#quickStats"),tabs:$("#tabs"),toolbar:$(".toolbar"),
 newBtn:$("#newTaskButton"),refresh:$("#refreshButton"),logout:$("#logoutButton"),search:$("#searchInput"),respF:$("#responsavelFilter"),prioF:$("#priorityFilter"),stageF:$("#stageFilter"),
 board:$("#board"),clientBody:$("#clientTableBody"),team:$("#teamGrid"),weekDead:$("#weekDeadlines"),urg:$("#realUrgencies"),blockers:$("#blockerGrid"),metrics:$("#metricsGrid"),archive:$("#archiveGrid"),
 dialog:$("#taskDialog"),detailsDialog: $("#detailsDialog"),detailsBody: $("#detailsBody"),closeDetails: $("#closeDetailsButton"),form:$("#taskForm"),title:$("#dialogTitle"),taskId:$("#taskId"),close:$("#closeDialogButton"),cancel:$("#cancelTaskButton"),del:$("#deleteTaskButton"),
 tipo:$("#tipoDemandaSelect"),resp:$("#responsavelSelect"),rev:$("#revisorSelect"),etapa:$("#etapaSelect"),addClient:$("#addClientTaskButton"),checkin:$("#checkinGrid"),rules:$("#rulesList")
 };
+if (dom.filterToggle && dom.filterPanel) {
+  dom.filterToggle.onclick = () => {
+    dom.filterPanel.classList.toggle("hidden");
+  };
+}
 let supabase=null, session=null, member=null, members=[], tasks=[], channel=null;
 const valid=SUPABASE_URL?.startsWith("https://")&&!SUPABASE_URL.includes("SEU-PROJETO")&&SUPABASE_ANON_KEY&&!SUPABASE_ANON_KEY.includes("SUA_CHAVE");
 if(valid) supabase=createClient(SUPABASE_URL,SUPABASE_ANON_KEY); else dom.warning.classList.remove("hidden");
