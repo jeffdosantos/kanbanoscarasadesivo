@@ -53,6 +53,7 @@ const dom = {
   newBtn: $("#newTaskButton"),
   refresh: $("#refreshButton"),
   logout: $("#logoutButton"),
+  quickFilterButtons: $$(".filter-option"),
   search: $("#searchInput"),
   respF: $("#responsavelFilter"),
   prioF: $("#priorityFilter"),
