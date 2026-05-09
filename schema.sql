@@ -86,7 +86,7 @@ for delete using (
 );
 
 insert into public.team_members (nome,email,cor,funcao,ativo) values
-('Pessoa 1','pessoa1@studio.com','#2563eb','Designer Sênior',true),
+('Jefferson Ferreira ','jefferson@oscarasdoadesivo','#2563eb','Designer',true),
 ('Pessoa 2','pessoa2@studio.com','#16a34a','Designer',true),
 ('Pessoa 3','pessoa3@studio.com','#7c3aed','Designer Junior',true),
 ('Pessoa 4','pessoa4@studio.com','#ea580c','Motion Designer',true),
@@ -94,15 +94,6 @@ insert into public.team_members (nome,email,cor,funcao,ativo) values
 on conflict (email) do nothing;
 
 insert into public.tasks (cliente,titulo,tipo_demanda,responsavel_id,prioridade,prazo,data_entrada,etapa,status,proxima_acao,bloqueado,motivo_bloqueio,checklist)
-select 'Cliente A','Carrossel institucional','Carrossel',tm.id,'alta',current_date + interval '1 day',current_date,'criacao','em_andamento','Finalizar primeira versão',false,null,'[{"text":"Briefing recebido","done":true},{"text":"Primeira versão criada","done":false}]'::jsonb from public.team_members tm where tm.email='pessoa1@studio.com'
-union all
-select 'Cliente B','Ajustes identidade visual','Identidade visual',tm.id,'media',current_date + interval '7 days',current_date,'revisao','revisao_interna','Conferir aplicação da marca',false,null,'[]'::jsonb from public.team_members tm where tm.email='pessoa2@studio.com'
-union all
-select 'Cliente C','Landing page promocional','Landing page',tm.id,'urgente',current_date + interval '1 day',current_date,'briefing','aguardando_cliente','Aguardar textos do cliente',true,'Cliente ainda não enviou textos finais','[]'::jsonb from public.team_members tm where tm.email='pessoa3@studio.com'
-union all
-select 'Cliente D','Campanha de lançamento','Campanha',tm.id,'alta',current_date + interval '5 days',current_date,'planejamento','em_andamento','Definir peças da campanha',false,null,'[]'::jsonb from public.team_members tm where tm.email='pessoa4@studio.com'
-union all
-select 'Cliente E','Apresentação comercial','Apresentação',tm.id,'media',current_date + interval '2 days',current_date,'enviado_cliente','aguardando_cliente','Cobrar retorno do cliente',false,null,'[]'::jsonb from public.team_members tm where tm.email='pessoa5@studio.com'
 on conflict do nothing;
 
 alter publication supabase_realtime add table public.tasks;
