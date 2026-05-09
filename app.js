@@ -128,11 +128,35 @@ function subscribe(){if(channel)supabase.removeChannel(channel);channel=supabase
 function renderAll(){renderDates();renderQuick();renderBoard();renderClients();renderTeam();renderDeadlines();renderBlockers();renderMetrics();renderArchive();renderStatic()}
 function renderDates(){let s=startWeek(),e=addDays(s,4),f=new Intl.DateTimeFormat("pt-BR",{day:"2-digit",month:"2-digit"});dom.week.textContent=`${f.format(s)} – ${f.format(e)}/${e.getFullYear()}`;dom.updated.textContent=new Intl.DateTimeFormat("pt-BR").format(new Date())}
 function renderQuick(){let active=tasks.filter(t=>!isDone(t)).length, creation=tasks.filter(t=>t.etapa==="criacao").length, blocked=tasks.filter(isBlocked).length, wait=tasks.filter(t=>t.status==="aguardando_cliente"||t.etapa==="enviado_cliente").length;dom.quick.innerHTML=[["mini-blue",active,"Cards ativos"],["mini-purple",creation,"Em criação"],["mini-red",blocked,"Bloqueados"],["mini-grey",wait,"Aguard. cliente"]].map(([c,n,l])=>`<div class="mini-stat ${c}"><strong>${n}</strong>${l}</div>`).join("")}
-function renderBoard(){let fs=filtered();dom.board.innerHTML=COLUMNS.map(c=>{let list=fs.filter(t=>t.etapa===c.id);return `<section class="column" data-stage="${c.id}"><header class="column-head" style="background:${c.color}"><span>${esc(c.title)}</span><span class="count">${list.length}</span></header><div class="column-body">${list.length?list.map(card).join(""):`<div class="empty-drop">${esc(c.help||"Arraste um card aqui")}</div>`}</div><button class="add-card-btn" data-add-stage="${c.id}">
-  ＋ Adicionar card
-</button>
-</section>
-`}).join("");attachDrag()}
+function renderBoard(){
+  let fs = filtered();
+
+  dom.board.innerHTML = COLUMNS.map(c => {
+    let list = fs.filter(t => t.etapa === c.id);
+
+    return `<section class="column" data-stage="${c.id}">
+      <header class="column-head" style="background:${c.color}">
+        <span>${esc(c.title)}</span>
+        <span class="count">${list.length}</span>
+      </header>
+
+      <div class="column-body">
+        ${
+          list.length
+            ? list.map(card).join("")
+            : `<div class="empty-drop">${esc(c.help || "Arraste um card aqui")}</div>`
+        }
+      </div>
+
+      <button class="add-card-btn" data-add-stage="${c.id}">
+        ＋ Adicionar card
+      </button>
+    </section>`;
+  }).join("");
+
+  attachDrag();
+  enableBoardMouseScroll();
+}
 function card(t){let chk=Array.isArray(t.checklist)?t.checklist:[],done=chk.filter(i=>i.done||i.concluido).length,total=chk.length||13,doneN=chk.length?done:Math.min(6,total), pct=Math.round(doneN/total*100);let m=memberById(t.responsavel_id);return `<article class="task-card priority-${esc(t.prioridade||"media")} ${overdue(t)?"overdue":""} ${isBlocked(t)?"blocked":""}" draggable="true" data-id="${t.id}">
 <div class="card-top"><div><span class="tag ${esc(t.prioridade||"media")}">● ${PRIORITY[t.prioridade]||"Média"}</span></div><button class="card-menu" data-edit="${t.id}">✎</button></div>
 <p class="client-name">${esc(t.cliente)}</p><h3 class="task-title">${esc(t.titulo)}</h3>
@@ -411,28 +435,7 @@ function enableBoardMouseScroll() {
   board.addEventListener(
     "wheel",
     (e) => {
-      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
-
-      const canScroll =
-        board.scrollWidth > board.clientWidth;
-
-      if (!canScroll) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      board.scrollLeft += e.deltaY;
-    },
-    { passive: false }
-  );
-}
-
-enableBoardMouseScroll();
-function renderBoard(){
-  let fs = filtered();
-
-  dom.board.innerHTML = COLUMNS.map(...).join("");
-
-  attachDrag();
-  enableBoardMouseScroll();
-}
+$("#miniLogoutButton")?.addEventListener("click", async () => {
+  await supabase.auth.signOut();
+  location.reload();
+});
