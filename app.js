@@ -365,6 +365,10 @@ function enableBoardMouseScroll() {
 
   if (!board) return;
 
+  const isMobile = window.matchMedia("(max-width: 760px)").matches;
+
+  if (isMobile) return;
+
   board.addEventListener(
     "wheel",
     (e) => {
