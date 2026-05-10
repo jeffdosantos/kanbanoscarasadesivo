@@ -919,7 +919,7 @@ function openDetails(t) {
     <button class="btn danger" type="button" id="detailsDelete">🗑️ Excluir</button>
     <button class="btn success" type="button" id="detailsComplete">✅ Concluir serviço</button>
   </div>
-  };
+
   <button class="btn primary" type="button" id="detailsEdit">✎ Editar</button>
 </div>
 $("#detailsEdit").onclick = () => {
