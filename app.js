@@ -336,21 +336,21 @@ function renderBoard(){
 
     return `<section class="column" data-stage="${c.id}">
       <header class="column-head" style="background:${c.color}">
-        <span>${esc(c.title)}</span>
-        <span class="count">${list.length}</span>
-      </header>
+  <span>${esc(c.title)}</span>
+  <span class="count">${list.length}</span>
+</header>
 
-      <div class="column-body">
+<button class="column-add-btn" data-add-stage="${c.id}">
+  ＋ Novo card
+</button>
+
+<div class="column-body">
         ${
           list.length
             ? list.map(card).join("")
             : `<div class="empty-drop">${esc(c.help || "Arraste um card aqui")}</div>`
         }
       </div>
-
-      <button class="add-card-btn" data-add-stage="${c.id}">
-        ＋ Adicionar card
-      </button>
     </section>`;
   }).join("");
 
