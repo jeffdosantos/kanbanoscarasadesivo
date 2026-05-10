@@ -285,8 +285,6 @@ async function saveColumns(e) {
 
   toast("Etapas atualizadas.");
 }
-
-dom.columnsForm.onsubmit = saveColumns;
 function esc(v=""){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function today(){let d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
 function date(v){if(!v)return null;let [y,m,d]=v.split("-").map(Number);return new Date(y,m-1,d)}
