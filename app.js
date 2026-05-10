@@ -394,8 +394,36 @@ async function openColumnsManager() {
     <div class="column-config-row" data-column-id="${c.id}">
       <input name="title" value="${esc(c.title)}" placeholder="Nome da etapa" />
       <input name="color" value="${esc(c.color)}" type="color" />
-      <input name="position" value="${c.position}" type="number" />
-      <label class="check">
+<div class="column-config-row" data-column-id="${c.id}">
+  <div class="column-config-main">
+    <input
+      name="title"
+      value="${esc(c.title)}"
+      placeholder="Nome da etapa"
+    />
+
+    <input
+      name="color"
+      value="${esc(c.color)}"
+      type="color"
+    />
+  </div>
+
+  <div class="column-config-actions">
+    <button type="button" class="move-up">↑</button>
+    <button type="button" class="move-down">↓</button>
+
+    <label class="check">
+      <input
+        name="active"
+        type="checkbox"
+        ${c.active ? "checked" : ""}
+      />
+      Ativa
+    </label>
+  </div>
+</div>
+  <label class="check">
         <input name="active" type="checkbox" ${c.active ? "checked" : ""} />
         Ativa
       </label>
