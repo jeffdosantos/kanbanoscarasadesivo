@@ -961,12 +961,23 @@ $("#detailsDelete").onclick = async () => {
 $("#detailsComplete").onclick = async () => {
   await completeTask(t.id);
 };
-  async function reopenTask(id) {
+async function reopenTask(id) {
   if (!id) return;
 
+  const currentTask = tasks.find(t => t.id === id);
+
+  if (!currentTask) {
+    toast("Card não encontrado.", "error");
+    return;
+  }
+
   const patch = {
-    etapa: "aprovado",
-    status: "aprovado",
+    etapa: currentTask.previous_etapa || "aprovado",
+    status: currentTask.previous_status || "aprovado",
+
+    previous_etapa: null,
+    previous_status: null,
+
     updated_by: session?.user?.email || null
   };
 
@@ -985,7 +996,8 @@ $("#detailsComplete").onclick = async () => {
   );
 
   renderAll();
-  toast("Serviço reaberto.");
+
+  toast("Serviço reaberto na etapa anterior.");
 }
   dom.detailsBody.querySelectorAll("[data-detail-check]").forEach(input => {
     input.addEventListener("change", async () => {
@@ -1020,9 +1032,20 @@ $("#detailsComplete").onclick = async () => {
 async function completeTask(id) {
   if (!id) return;
 
+  const currentTask = tasks.find(t => t.id === id);
+
+  if (!currentTask) {
+    toast("Card não encontrado.", "error");
+    return;
+  }
+
   const patch = {
+    previous_etapa: currentTask.etapa,
+    previous_status: currentTask.status,
+
     etapa: "entregue",
     status: "entregue",
+
     updated_by: session?.user?.email || null
   };
 
@@ -1043,7 +1066,8 @@ async function completeTask(id) {
   );
 
   renderAll();
-  toast("Serviço finalizado!");
+
+  toast("Serviço concluído e enviado para Arquivo.");
 }
 function openTask(t=null){dom.form.reset();dom.del.style.display=t?"inline-flex":"none";dom.title.textContent=t?"Editar card":"Novo card";dom.taskId.value=t?.id||"";if(t){Object.entries(t).forEach(([k,v])=>{let f=dom.form.elements[k];if(!f)return;if(f.type==="checkbox")f.checked=!!v;else f.value=v??""})}else{dom.form.elements.data_entrada.value=today();dom.form.elements.etapa.value="entrada"}renderChecklist(t?.checklist || []);dom.dialog.showModal()}
 async function saveTask(e){
