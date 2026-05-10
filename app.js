@@ -34,6 +34,7 @@ const DEFAULT_CHECKLIST = [
 ];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const dom = {
+  clienteSelect: $("#clienteSelect"),
   filterToggle: $("#filterToggleButton"),
   filterPanel: $("#filterPanel"),
   auth: $("#authScreen"),
@@ -154,11 +155,40 @@ if (dom.filterToggle && dom.filterPanel) {
     dom.filterPanel.classList.add("hidden");
   });
 }
-let supabase=null, session=null, member=null, members=[], tasks=[], channel=null;
+let supabase=null, session=null, member=null, members=[], clients=[], tasks=[], channel=null;
 let activeQuickFilter = "";
 const valid=SUPABASE_URL?.startsWith("https://")&&!SUPABASE_URL.includes("SEU-PROJETO")&&SUPABASE_ANON_KEY&&!SUPABASE_ANON_KEY.includes("SUA_CHAVE");
 if(valid) supabase=createClient(SUPABASE_URL,SUPABASE_ANON_KEY); else dom.warning.classList.remove("hidden");
+function clientById(id) {
+  return clients.find(c => c.id === id) || null;
+}
 
+function clientName(id) {
+  return clientById(id)?.nome || "Cliente não definido";
+}
+
+function fillClients() {
+  if (!dom.clienteSelect) return;
+
+  dom.clienteSelect.innerHTML =
+    "<option value=''>Selecione um cliente</option>" +
+    clients.map(c => `
+      <option value="${c.id}">${esc(c.nome)}</option>
+    `).join("");
+}
+
+async function loadClients() {
+  const { data, error } = await supabase
+    .from("clients")
+    .select("*")
+    .eq("ativo", true)
+    .order("nome");
+
+  if (error) throw error;
+
+  clients = data || [];
+  fillClients();
+}
 function esc(v=""){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function today(){let d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
 function date(v){if(!v)return null;let [y,m,d]=v.split("-").map(Number);return new Date(y,m-1,d)}
@@ -228,6 +258,7 @@ async function start(s){try{session=s;let m=await ensureMember(s);showApp();awai
 if (currentUserName) {
   currentUserName.textContent = `👤 ${m.nome}`;
 }
+await loadClients();
 await loadTasks();subscribe()}catch(e){console.error(e);showAuth();toast(e.message,"error")}}
 function subscribe(){if(channel)supabase.removeChannel(channel);channel=supabase.channel("tasks").on("postgres_changes",{event:"*",schema:"public",table:"tasks"},()=>loadTasks()).subscribe()}
 function renderAll(){renderDates();renderQuick();renderBoard();renderClients();renderTeam();renderDeadlines();renderBlockers();renderMetrics();renderArchive();renderStatic()}
@@ -614,7 +645,7 @@ async function saveTask(e){
     }));
 
   let payload = {
-    cliente: fd.get("cliente"),
+cliente_id: fd.get("cliente_id") || null,
     titulo: fd.get("titulo"),
     tipo_demanda: fd.get("tipo_demanda") || null,
     responsavel_id: fd.get("responsavel_id") || null,

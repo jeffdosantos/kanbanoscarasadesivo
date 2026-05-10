@@ -152,7 +152,13 @@
       <div class="modal-head"><div><small>Card de demanda</small><h2 id="dialogTitle">Novo card</h2></div><button type="button" id="closeDialogButton" class="icon-btn">×</button></div>
       <input type="hidden" name="id" id="taskId" />
       <div class="form-grid">
-        <label>Cliente *<input name="cliente" required /></label><label>Projeto / demanda *<input name="titulo" required /></label>
+       <label>
+  Cliente *
+  <select name="cliente_id" id="clienteSelect" required>
+    <option value="">Selecione um cliente</option>
+  </select>
+</label>
+<label>Projeto / demanda *<input name="titulo" required /></label>
         <label>Tipo de peça<select name="tipo_demanda" id="tipoDemandaSelect"></select></label><label>Responsável<select name="responsavel_id" id="responsavelSelect"></select></label>
         <label>Apoio / revisor<select name="revisor_id" id="revisorSelect"></select></label><label>Prioridade<select name="prioridade"><option value="urgente">Urgente</option><option value="alta">Alta</option><option value="media" selected>Média</option><option value="baixa">Baixa</option></select></label>
         <label>Prazo final<input name="prazo" type="date" /></label><label>Data de entrada<input name="data_entrada" type="date" /></label>
