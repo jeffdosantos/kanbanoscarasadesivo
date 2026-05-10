@@ -494,7 +494,7 @@ function card(t) {
   let m = memberById(t.responsavel_id);
   let clienteNome = clientName(t.cliente_id, t.cliente || "Sem cliente");
 
-  return `<article class="task-card priority-${esc(t.prioridade || "media")} ${overdue(t) ? "overdue" : ""} ${isBlocked(t) ? "blocked" : ""}" draggable="true" data-id="${t.id}">
+  return `<article class="task-card priority-${esc(t.prioridade || "media")} ${overdue(t) ? "overdue" : ""} ${isBlocked(t) ? "blocked" : ""}" draggable="${!window.matchMedia("(max-width: 760px)").matches}">
     <div class="card-top">
       <div><span class="tag ${esc(t.prioridade || "media")}">● ${PRIORITY[t.prioridade] || "Média"}</span></div>
       <button class="card-menu" data-edit="${t.id}">✎</button>
