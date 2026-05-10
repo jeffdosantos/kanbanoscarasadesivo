@@ -922,6 +922,7 @@ function openDetails(t) {
 
   <button class="btn primary" type="button" id="detailsEdit">✎ Editar</button>
 </div>
+`;
 $("#detailsEdit").onclick = () => {
   dom.detailsDialog.close();
   openTask(t);
