@@ -1055,3 +1055,27 @@ body {
     overflow-x: auto;
   }
 }
+@media (max-width: 760px) {
+  html,
+  body {
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    height: auto !important;
+  }
+
+  #view-kanban,
+  .view.active,
+  .board {
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .column,
+  .column-body {
+    height: auto !important;
+    min-height: auto !important;
+    overflow: visible !important;
+  }
+}
