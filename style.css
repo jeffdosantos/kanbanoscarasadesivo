@@ -862,3 +862,61 @@ body {
 .client-group-head span {
   color: #64748b;
 }
+.columns-manager {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.column-config-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 16px;
+
+  padding: 14px;
+
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+
+  background: #ffffff;
+}
+
+.column-config-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  flex: 1;
+}
+
+.column-config-main input[type="text"] {
+  flex: 1;
+}
+
+.column-config-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.move-up,
+.move-down {
+  width: 34px;
+  height: 34px;
+
+  border: 1px solid #dbe3ef;
+  border-radius: 10px;
+
+  background: #fff;
+
+  cursor: pointer;
+
+  font-weight: 700;
+}
+
+.move-up:hover,
+.move-down:hover {
+  background: #f8fafc;
+}
