@@ -2,18 +2,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 import { SUPABASE_URL, SUPABASE_ANON_KEY } from "./config.js";
 
 let COLUMNS = [];
-["entrada","(1) Entrada / Nova Demanda","#71839b","Arraste um card aqui"],
-["triagem","(2) Triagem / Organização","#de8500","Arraste um card aqui"],
-["briefing","(3) Briefing","#d89a00",""],
-["planejamento","(4) Fila de Produção","#3b82f6",""],
-["criacao","(5) Criação em Andamento","#1d4ed8"],
-["revisao","(6) Revisão Interna","#7c3aed",""],
-["enviado_cliente","(7) Enviado ao Cliente","#64748b",""],
-["ajustes","(8) Ajustes Solicitados","#f97316",""],
-["aprovado","(9) Aprovado / Preparar Entrega","#16a34a",""],
-["entregue","(10) Entregue / Finalizado","#15803d",""],
-["bloqueado","(11) Bloqueado / Problemas","#dc2626",""]
-].map(([id,title,color,help])=>({id,title,color,help}));
+.map(([id,title,color,help])=>({id,title,color,help}));
 const DEMAND_TYPES=["Identidade visual","Social media","Post avulso","Carrossel","Campanha","Landing page","Site","Apresentação","Impressos","Motion / vídeo","Embalagem","Edição de imagem","Peça urgente","Ajuste simples","Projeto estratégico"];
 const STATUS={em_andamento:"Em andamento",revisao_interna:"Em revisão",aguardando_cliente:"Aguardando cliente",bloqueado:"Bloqueado",aprovado:"Aprovado",entregue:"Entregue"};
 const PRIORITY={urgente:"Urgente",alta:"Alta",media:"Média",baixa:"Baixa"};
@@ -34,6 +23,12 @@ const DEFAULT_CHECKLIST = [
 ];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const dom = {
+columnsDialog: $("#columnsDialog"),
+columnsForm: $("#columnsForm"),
+columnsManager: $("#columnsManager"),
+closeColumns: $("#closeColumnsButton"),
+cancelColumns: $("#cancelColumnsButton"),
+addColumn: $("#addColumnButton"),
 manageColumns: $("#manageColumnsButton"),
 clientDialog: $("#clientDialog"),
 clientForm: $("#clientForm"),
@@ -361,7 +356,7 @@ async function start(s){try{session=s;let m=await ensureMember(s);showApp();awai
 if (currentUserName) {
   currentUserName.textContent = `👤 ${m.nome}`;
 }
-await loadClients();
+await loadClients();await loadColumns();
 await loadTasks();subscribe()}catch(e){console.error(e);showAuth();toast(e.message,"error")}}
 function subscribe(){if(channel)supabase.removeChannel(channel);channel=supabase.channel("tasks").on("postgres_changes",{event:"*",schema:"public",table:"tasks"},()=>loadTasks()).subscribe()}
 function renderAll(){renderDates();renderQuick();renderBoard();renderClients();renderTeam();renderDeadlines();renderBlockers();renderMetrics();renderArchive();renderStatic()}
