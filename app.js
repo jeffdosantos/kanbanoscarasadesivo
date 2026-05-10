@@ -420,12 +420,6 @@ async function openColumnsManager() {
       />
       Ativa
     </label>
-  </div>
-</div>
-  <label class="check">
-        <input name="active" type="checkbox" ${c.active ? "checked" : ""} />
-        Ativa
-      </label>
     </div>
   `).join("");
    bindColumnReorder();
