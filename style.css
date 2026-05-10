@@ -920,3 +920,55 @@ body {
 .move-down:hover {
   background: #f8fafc;
 }
+.color-picker-wrap {
+  width: 38px;
+  height: 38px;
+
+  border-radius: 999px;
+
+  overflow: hidden;
+
+  border: 2px solid #e2e8f0;
+
+  cursor: pointer;
+
+  flex-shrink: 0;
+
+  transition:
+    transform .18s ease,
+    border-color .18s ease;
+}
+
+.color-picker-wrap:hover {
+  transform: scale(1.06);
+  border-color: #94a3b8;
+}
+
+.color-picker {
+  appearance: none;
+
+  width: 100%;
+  height: 100%;
+
+  border: none;
+  padding: 0;
+  margin: 0;
+
+  background: transparent;
+
+  cursor: pointer;
+}
+
+.color-picker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.color-picker::-webkit-color-swatch {
+  border: none;
+  border-radius: 999px;
+}
+
+.color-picker::-moz-color-swatch {
+  border: none;
+  border-radius: 999px;
+}
