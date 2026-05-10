@@ -34,6 +34,11 @@ const DEFAULT_CHECKLIST = [
 ];
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const dom = {
+clientDialog: $("#clientDialog"),
+clientForm: $("#clientForm"),
+closeClient: $("#closeClientDialogButton"),
+cancelClient: $("#cancelClientButton"),
+clienteSelect: $("#clienteSelect"),
   clienteSelect: $("#clienteSelect"),
   filterToggle: $("#filterToggleButton"),
   filterPanel: $("#filterPanel"),
@@ -188,6 +193,37 @@ async function loadClients() {
 
   clients = data || [];
   fillClients();
+}
+function openClient() {
+  dom.clientForm.reset();
+  dom.clientDialog.showModal();
+}
+
+async function saveClient(e) {
+  e.preventDefault();
+
+  const fd = new FormData(dom.clientForm);
+
+  const payload = {
+    nome: fd.get("nome").trim(),
+    ativo: true
+  };
+
+  const { error } = await supabase
+    .from("clients")
+    .insert(payload);
+
+  if (error) {
+    toast(error.message, "error");
+    return;
+  }
+
+  dom.clientDialog.close();
+
+  await loadClients();
+  await loadTasks();
+
+  toast("Cliente cadastrado.");
 }
 function esc(v=""){return String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
 function today(){let d=new Date();d.setMinutes(d.getMinutes()-d.getTimezoneOffset());return d.toISOString().slice(0,10)}
@@ -679,7 +715,9 @@ cliente_id: fd.get("cliente_id") || null,
 }
 async function deleteTask(){let id=dom.taskId.value;if(!id||!confirm("Excluir este card?"))return;let {error}=await supabase.from("tasks").delete().eq("id",id);if(error)return toast(error.message,"error");dom.dialog.close();await loadTasks()}
 dom.tabs.onclick=e=>{let b=e.target.closest(".tab");if(!b)return;$$(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");$$(".view").forEach(v=>v.classList.remove("active"));$(`#view-${b.dataset.tab}`).classList.add("active");dom.toolbar.style.display=b.dataset.tab==="kanban"||b.dataset.tab==="clientes"?"flex":"none"}
-dom.newBtn.onclick=()=>openTask();dom.addClient.onclick=()=>openTask();dom.close.onclick=()=>dom.dialog.close();dom.cancel.onclick=()=>dom.dialog.close();dom.del.onclick=deleteTask;dom.form.onsubmit=saveTask;[dom.search, dom.respF, dom.prioF, dom.stageF].forEach(el => {
+dom.newBtn.onclick=()=>openTask();dom.addClient.onclick = () => openClient();dom.close.onclick=()=>dom.dialog.close();dom.cancel.onclick=()=>dom.dialog.close();dom.del.onclick=deleteTask;dom.closeClient.onclick = () => dom.clientDialog.close();
+dom.cancelClient.onclick = () => dom.clientDialog.close();
+dom.clientForm.onsubmit = saveClient;dom.form.onsubmit=saveTask;[dom.search, dom.respF, dom.prioF, dom.stageF].forEach(el => {
   el.oninput = () => {
     updateFilterButtonLabel();
     renderAll();

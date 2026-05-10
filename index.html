@@ -125,6 +125,30 @@
       <button class="tab" data-tab="metricas">📊 Métricas</button>
       <button class="tab" data-tab="arquivo">📦 Arquivo</button>
  </nav>
+ <dialog id="clientDialog" class="modal">
+  <form id="clientForm" method="dialog">
+    <div class="modal-head">
+      <div>
+        <small>Cadastro de cliente</small>
+        <h2>Novo cliente</h2>
+      </div>
+      <button type="button" id="closeClientDialogButton" class="icon-btn">×</button>
+    </div>
+
+    <div class="form-grid">
+      <label class="full">
+        Nome do cliente *
+        <input name="nome" required placeholder="Ex: Luh Studio" />
+      </label>
+    </div>
+
+    <div class="modal-actions">
+      <span></span>
+      <button type="button" id="cancelClientButton" class="btn ghost">Cancelar</button>
+      <button type="submit" class="btn primary">Salvar cliente</button>
+    </div>
+  </form>
+</dialog>
     <section class="view active" id="view-kanban">
       <div id="board" class="board"></div>
     </section>
