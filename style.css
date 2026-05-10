@@ -1079,3 +1079,11 @@ body {
     overflow: visible !important;
   }
 }
+@media (max-width: 760px) {
+  .task-card,
+  .column,
+  .column-body,
+  .board {
+    touch-action: pan-y !important;
+  }
+}
