@@ -1085,6 +1085,10 @@ async function saveTask(e){
 
   let fd = new FormData(dom.form);
   let id = fd.get("id");
+  if (!fd.get("cliente_id")) {
+  toast("Selecione um cliente cadastrado.", "error");
+  return;
+}
 
   const checklist = [...document.querySelectorAll("[data-check]")]
     .map((el, index) => ({
