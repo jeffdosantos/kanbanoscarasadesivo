@@ -1079,16 +1079,46 @@ async function completeTask(id) {
 
   toast("Serviço concluído e enviado para Arquivo.");
 }
-function openTask(t=null){dom.form.reset();dom.del.style.display=t?"inline-flex":"none";dom.title.textContent=t?"Editar card":"Novo card";dom.taskId.value=t?.id||"";if(t){Object.entries(t).forEach(([k,v])=>{let f=dom.form.elements[k];if(!f)return;if(f.type==="checkbox")f.checked=!!v;else f.value=v??""})}else{dom.form.elements.data_entrada.value=today();dom.form.elements.etapa.value="entrada"}renderChecklist(t?.checklist || []);dom.dialog.showModal()}
-async function saveTask(e){
+function openTask(t = null) {
+  dom.form.reset();
+
+  dom.del.style.display = t ? "inline-flex" : "none";
+  dom.title.textContent = t ? "Editar card" : "Novo card";
+  dom.taskId.value = t?.id || "";
+
+  if (t) {
+    Object.entries(t).forEach(([k, v]) => {
+      let f = dom.form.elements[k];
+      if (!f) return;
+
+      if (f.type === "checkbox") {
+        f.checked = !!v;
+      } else {
+        f.value = v ?? "";
+      }
+    });
+
+    if (dom.clienteSearchInput && dom.clienteIdInput) {
+      dom.clienteSearchInput.value = clientName(t.cliente_id, "");
+      dom.clienteIdInput.value = t.cliente_id || "";
+    }
+  } else {
+    dom.form.elements.data_entrada.value = today();
+    dom.form.elements.etapa.value = "entrada";
+
+    if (dom.clienteSearchInput && dom.clienteIdInput) {
+      dom.clienteSearchInput.value = "";
+      dom.clienteIdInput.value = "";
+    }
+  }
+
+  renderChecklist(t?.checklist || []);
+  dom.dialog.showModal();
+}async function saveTask(e){
   e.preventDefault();
 
   let fd = new FormData(dom.form);
   let id = fd.get("id");
-  if (!fd.get("cliente_id")) {
-  toast("Selecione um cliente cadastrado.", "error");
-  return;
-}
 
   const checklist = [...document.querySelectorAll("[data-check]")]
     .map((el, index) => ({
