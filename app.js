@@ -1104,14 +1104,32 @@ cliente_id: fd.get("cliente_id") || null,
   };
 
   let res = id
-    ? await supabase.from("tasks").update(payload).eq("id", id)
-    : await supabase.from("tasks").insert(payload);
-
+  ? await supabase
+      .from("tasks")
+      .update(payload)
+      .eq("id", id)
+      .select()
+  : await supabase
+      .from("tasks")
+      .insert(payload)
+      .select();
   if (res.error) return toast(res.error.message, "error");
+dom.dialog.close();
 
-  dom.dialog.close();
+if (id) {
+  tasks = tasks.map(t =>
+    t.id === id ? { ...t, ...payload, id } : t
+  );
+} else if (res.data?.[0]) {
+  tasks.unshift(res.data[0]);
+} else {
   await loadTasks();
   toast("Card salvo.");
+  return;
+}
+
+renderAll();
+toast("Card salvo.");
 }
 async function deleteTask(){let id=dom.taskId.value;if(!id||!confirm("Excluir este card?"))return;let {error}=await supabase.from("tasks").delete().eq("id",id);if(error)return toast(error.message,"error");dom.dialog.close();await loadTasks()}
 dom.tabs.onclick=e=>{let b=e.target.closest(".tab");if(!b)return;$$(".tab").forEach(x=>x.classList.remove("active"));b.classList.add("active");$$(".view").forEach(v=>v.classList.remove("active"));$(`#view-${b.dataset.tab}`).classList.add("active");dom.toolbar.style.display=b.dataset.tab==="kanban"||b.dataset.tab==="clientes"?"flex":"none"}
