@@ -1114,21 +1114,29 @@ function openTask(t = null) {
 
   renderChecklist(t?.checklist || []);
   dom.dialog.showModal();
-}async function saveTask(e){
+}
+async function saveTask(e){
   e.preventDefault();
 
   let fd = new FormData(dom.form);
   let id = fd.get("id");
 
-  const checklist = [...document.querySelectorAll("[data-check]")]
-    .map((el, index) => ({
-      text: DEFAULT_CHECKLIST[index],
-      done: el.checked
-    }));
-if (dom.clienteSearchInput && dom.clienteIdInput) {
-  dom.clienteSearchInput.value = clientName(t.cliente_id, "");
-  dom.clienteIdInput.value = t.cliente_id || "";
+const typedClientName = dom.clienteSearchInput?.value.trim().toLowerCase();
+
+const foundClient = clients.find(c =>
+  c.nome.trim().toLowerCase() === typedClientName
+);
+
+if (!foundClient) {
+  toast("Selecione um cliente cadastrado da lista.", "error");
+  return;
 }
+
+if (dom.clienteIdInput) {
+  dom.clienteIdInput.value = foundClient.id;
+}
+
+fd = new FormData(dom.form);
   let payload = {
 cliente_id: fd.get("cliente_id") || null,
     titulo: fd.get("titulo"),
