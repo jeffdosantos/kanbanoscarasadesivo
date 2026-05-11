@@ -1139,3 +1139,70 @@ body {
   padding: 0 12px;
   font-size: 13px;
 }
+.board {
+  background: #eef2f7;
+  align-items: flex-start;
+}
+
+.column {
+  background: transparent;
+  min-width: 380px;
+  padding: 0 12px 18px;
+}
+
+.column-body {
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 0;
+}
+
+.task-card {
+  width: 100%;
+  min-height: auto;
+  height: auto;
+
+  padding: 18px 20px;
+
+  background: #ffffff;
+  border: 1px solid #dfe5ec;
+  border-radius: 18px;
+
+  box-shadow: 0 8px 20px rgba(15, 23, 42, .08);
+
+  overflow: visible;
+}
+
+.task-card .card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.task-card .client-name {
+  margin: 8px 0 4px;
+}
+
+.task-card .task-title {
+  margin: 0 0 12px;
+}
+
+.task-card .tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.task-card .progress {
+  margin-top: 12px;
+}
+
+.empty-drop {
+  min-height: 260px;
+  background: rgba(255,255,255,.35);
+  border: 2px dashed #d6dbe4;
+  border-radius: 18px;
+}
