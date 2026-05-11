@@ -1137,6 +1137,12 @@ if (dom.clienteIdInput) {
 }
 
 fd = new FormData(dom.form);
+const checklist = [...document.querySelectorAll("[data-check]")]
+  .map((el, index) => ({
+    text: DEFAULT_CHECKLIST[index],
+    done: el.checked
+  }));
+  
   let payload = {
 cliente_id: fd.get("cliente_id") || null,
     titulo: fd.get("titulo"),
